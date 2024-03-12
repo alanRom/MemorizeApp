@@ -17,9 +17,9 @@ let animalEmojis = ["🐥", "🐴", "🐝", "🕷️", "🐟", "🦑", "🐱", "
 
 struct EmojiMemoryGameView: View {
     
-    var viewModel: EmojiMemoryGame
+   @ObservedObject var viewModel: EmojiMemoryGame
     
-    @State var emojis: [String] = []
+    
     @State var activeTheme: Themes = Themes.None
     
     @State var cardCount = 0
@@ -32,6 +32,9 @@ struct EmojiMemoryGameView: View {
                 cards
             }
             Spacer()
+            Button("Shuffle"){
+                viewModel.shuffle()
+            }
 //            cardCountAdjusters
             themeChoosers
         }
@@ -40,10 +43,11 @@ struct EmojiMemoryGameView: View {
     }
     
     var cards: some View {
-        LazyVGrid(columns: [GridItem(.adaptive(minimum: 60))]) {
-            ForEach(0..<cardCount, id: \.self){ index in
-                CardView(content: emojis[index])
+        LazyVGrid(columns: [GridItem(.adaptive(minimum: 85), spacing: 0)], spacing: 0) {
+            ForEach(viewModel.cards.indices, id: \.self){ index in
+                CardView(viewModel.cards[index])
                     .aspectRatio(2/3, contentMode:.fit)
+                    .padding(4)
             }
         }
         .foregroundColor(.orange)
@@ -68,22 +72,6 @@ struct EmojiMemoryGameView: View {
         }
     }
     
-//    func cardCountAdjuster(by offset: Int, symbol: String) -> some View {
-//        Button(action: {
-//                cardCount += offset
-//            }, label: {
-//            Image(systemName: symbol)
-//        })
-//        .disabled(cardCount + offset < 1 || cardCount + offset > (emojis.count - 1))
-//    }
-//    
-//    var cardRemover: some View {
-//        cardCountAdjuster(by: -1, symbol: "rectangle.stack.fill.badge.minus")
-//    }
-//    
-//    var cardAdder: some View {
-//        cardCountAdjuster(by: 1, symbol: "rectangle.stack.fill.badge.plus")
-//    }
     
     var halloweenThemeButton: some View {
         cardThemeButton(theme: Themes.Halloween, label: "Halloween", symbol: "theatermasks.fill")
@@ -115,7 +103,7 @@ struct EmojiMemoryGameView: View {
             let randomCount = Int.random(in: 2..<emojisToUse.count)
             emojisToUse = Array(emojisToUse[0..<randomCount])
             emojisToUse = emojisToUse + emojisToUse + emojisToUse
-            self.emojis = emojisToUse.shuffled()
+//            self.emojis = emojisToUse.shuffled()
             self.cardCount = emojisToUse.count
             }, label: {
                 HStack {
@@ -129,8 +117,11 @@ struct EmojiMemoryGameView: View {
 }
 
 struct CardView: View {
-    let content: String
-    @State var isFaceUp: Bool = false
+    let card: MemoryGame<String>.Card
+    
+    init(_ card: MemoryGame<String>.Card) {
+        self.card = card
+    }
     
     var body: some View {
         ZStack (alignment: .center){
@@ -138,19 +129,19 @@ struct CardView: View {
             Group  {
                 base.foregroundColor(.white)
                 base.strokeBorder(lineWidth: 2)
-                Text(content).font(.largeTitle)
+                Text(card.content)
+                    .font(.system(size: 200))
+                    .minimumScaleFactor(0.01)
+                    .aspectRatio(1, contentMode: .fit)
             }
-            .opacity(isFaceUp ? 1 : 0)
+            .opacity(card.isFaceUp ? 1 : 0)
             
-            base.fill().opacity(isFaceUp ? 0 : 1)
+            base.fill().opacity(card.isFaceUp ? 0 : 1)
             
-        }
-        .onTapGesture {
-            isFaceUp.toggle()
         }
     }
 }
 
 #Preview {
-    EmojiMemoryGameView()
+    EmojiMemoryGameView(viewModel: EmojiMemoryGame())
 }
