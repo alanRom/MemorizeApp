@@ -7,23 +7,12 @@
 
 import SwiftUI
 
-enum Themes {
-    case None, Halloween, Food, Animals
-}
-
-
 
 struct EmojiMemoryGameView: View {
-    private let halloweenEmojis = ["👻", "🎃", "😈", "🕷️", "💀", "🕸️", "🧙‍♀️", "🙀", "👹", "😱", "☠️", "🍭" ]
-    private let foodEmojis = ["🍎", "🍒", "🍋", "🫒", "🍕", "🍟", "🥞", "🥐", "🫔", "🌮", "🍰", "🍙" ]
-    private let animalEmojis = ["🐥", "🐴", "🐝", "🕷️", "🐟", "🦑", "🐱", "🐶", "🐻‍❄️", "🦆", "🦊", "🐓" ]
+  
     
    @ObservedObject var viewModel: EmojiMemoryGame
     
-    
-    @State var activeTheme: Themes = Themes.None
-    
-    @State var cardCount = 0
     var body: some View {
         
         VStack {
@@ -38,7 +27,6 @@ struct EmojiMemoryGameView: View {
                 viewModel.shuffle()
             }
 //            cardCountAdjusters
-            themeChoosers
         }
        .padding()
 
@@ -58,67 +46,6 @@ struct EmojiMemoryGameView: View {
         .foregroundColor(.orange)
     }
     
-//    var cardCountAdjusters: some View {
-//        HStack {
-//            cardRemover
-//            Spacer()
-//            cardAdder
-//            
-//        }
-//        .imageScale(.large)
-//        .font(.largeTitle)
-//    }
-    
-    var themeChoosers: some View {
-        HStack{
-            halloweenThemeButton
-            foodThemeButton
-            animalThemeButton
-        }
-    }
-    
-    
-    var halloweenThemeButton: some View {
-        cardThemeButton(theme: Themes.Halloween, label: "Halloween", symbol: "theatermasks.fill")
-    }
-    
-    var foodThemeButton: some View {
-        cardThemeButton(theme: Themes.Food, label: "Food", symbol: "fork.knife")
-    }
-    
-    var animalThemeButton: some View {
-        cardThemeButton(theme: Themes.Animals, label: "Animals", symbol: "pawprint.fill")
-    }
-    
-    
-    func cardThemeButton(theme: Themes, label: String, symbol: String) -> some View {
-        Button(action: {
-            self.activeTheme = theme
-            var emojisToUse: [String];
-            switch(theme){
-                case Themes.Halloween:
-                    emojisToUse = halloweenEmojis
-                case Themes.Food:
-                    emojisToUse = foodEmojis
-                case Themes.Animals:
-                    emojisToUse = animalEmojis
-            case Themes.None:
-                    emojisToUse = []
-            }
-            let randomCount = Int.random(in: 2..<emojisToUse.count)
-            emojisToUse = Array(emojisToUse[0..<randomCount])
-            emojisToUse = emojisToUse + emojisToUse + emojisToUse
-//            self.emojis = emojisToUse.shuffled()
-            self.cardCount = emojisToUse.count
-            }, label: {
-                HStack {
-                    Image(systemName: symbol).font(.largeTitle)
-                    Text(label)
-                }
-            
-        })
-        .disabled(activeTheme == theme)
-    }
 }
 
 struct CardView: View {
