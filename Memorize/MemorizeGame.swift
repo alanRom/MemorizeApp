@@ -9,17 +9,20 @@ import Foundation
 
 struct MemoryGame<CardContent> where CardContent: Equatable {
     private(set) var cards: Array<Card>
+    private(set) var score: Int
+    
     
     init(numberOfPairsOfCars: Int, cardContentFactory: (Int) -> CardContent) {
         self.cards = []
-        // add numberOfPairsOfCars * 2
         for pairIndex in 0..<max(numberOfPairsOfCars, 2) {
             let content = cardContentFactory(pairIndex)
-            cards.append(Card(content: content, id: "\(pairIndex+1)a"))
-            cards.append(Card(content: content, id: "\(pairIndex+1)b"))
+            self.cards .append(Card(content: content, id: "\(pairIndex+1)a"))
+            self.cards .append(Card(content: content, id: "\(pairIndex+1)b"))
         }
-        self.cards.shuffle()
+        self.cards .shuffle()
+        self.score = 0
     }
+        
     
     var indexOfTheOneAndOnlyFaceUpCard: Int? {
         get { cards.indices.filter { index in cards[index].isFaceUp }.only }
@@ -46,8 +49,9 @@ struct MemoryGame<CardContent> where CardContent: Equatable {
     
     mutating func shuffle(){
         cards.shuffle()
-        print(cards)
     }
+    
+
     
     struct Card: Equatable, Identifiable, CustomDebugStringConvertible {
         var debugDescription: String {
@@ -61,6 +65,8 @@ struct MemoryGame<CardContent> where CardContent: Equatable {
         var id: String
     }
 }
+
+
 
 extension Array {
     var only: Element? {

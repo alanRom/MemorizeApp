@@ -10,10 +10,11 @@ import SwiftUI
 
 class EmojiMemoryGame: ObservableObject {
     
-    private static let emojis = ["👻", "🎃", "😈", "🕷️", "💀", "🕸️", "🧙‍♀️", "🙀", "👹", "😱", "☠️", "🍭" ]
     
-    private static func createMemoryGame() -> MemoryGame<String> {
-        return MemoryGame(numberOfPairsOfCars: 10){ pairIndex in
+    
+    private static func createMemoryGame(theme: Theme) -> MemoryGame<String> {
+        let emojis = theme.emojis.shuffled()
+        return MemoryGame(numberOfPairsOfCars: theme.numberOfPairs){ pairIndex in
             if emojis.indices.contains(pairIndex) {
                 return emojis[pairIndex]
             } else {
@@ -22,22 +23,56 @@ class EmojiMemoryGame: ObservableObject {
             
         }
     }
+
     
     
-    @Published private var model = createMemoryGame()
+    @Published private var model: MemoryGame<String>
+    @Published private var theme: Theme
+    
+    init(){
+        let startingTheme = Theme.chooseTheme(themeIndex: Int.random(in: 0..<Theme.SupportedThemes.count)) ?? Theme.defaultTheme
+        theme = startingTheme
+        model = EmojiMemoryGame.createMemoryGame(theme: startingTheme)
+    }
     
     var cards: Array<MemoryGame<String>.Card> {
         return model.cards
     }
     
+    
+    func getColor() -> Color {
+        let color: Color
+        switch theme.color {
+            case "orange":
+                color = Color.orange
+            case "red":
+                color = Color.red
+            case "blue":
+                color = Color.blue
+            case "green":
+                color = Color.green
+            case "yellow":
+                color = Color.yellow
+            case "gray":
+                color = Color.gray
+            default:
+                color = Color.black
+        }
+        return color
+    }
+    
+    
+    //MARK: - Intents
+    
     func choose(_ card: MemoryGame<String>.Card){
         model.choose(card)
     }
-    
-    //MARK: - Intents
     
     func shuffle() {
         model.shuffle()
     }
     
+    func newGame() {
+        model = EmojiMemoryGame.createMemoryGame(theme: self.theme)
+    }
 }
