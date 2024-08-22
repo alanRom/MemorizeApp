@@ -39,6 +39,10 @@ class EmojiMemoryGame: ObservableObject {
         return model.cards
     }
     
+    var score: Int {
+        model.score
+    }
+    
     
     func getColor() -> Color {
         let color: Color
